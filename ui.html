@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS Analyzer — Procurement Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f4f5f7;
+      --white:  #ffffff;
+      --border: #e2e5ea;
+      --text:   #1a1d23;
+      --muted:  #6b7280;
+      --subtle: #9ca3af;
+      --navy:   #1e3a5f;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      padding: 0 36px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo     { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+    .logo-sep { color: var(--border); margin: 0 2px; }
+    .logo-sub { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+    .header-badge {
+      margin-left: auto;
+      font-size: 0.68rem; font-weight: 500;
+      color: var(--subtle);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      max-width: 1080px; width: 100%;
+      margin: 0 auto;
+      padding: 28px 24px 48px;
+    }
+
+    /* ── Control bar ── */
+    .control-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px; flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 20px 22px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .field-wrap label {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.7px;
+    }
+    .field-wrap input {
+      background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 13px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--text);
+      outline: none; min-width: 160px;
+      transition: border-color 0.15s;
+    }
+    .field-wrap input:focus { border-color: #94a3b8; }
+    .field-wrap input::placeholder { color: var(--subtle); }
+
+    /* Mode toggle */
+    .mode-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .mode-wrap label {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.7px;
+    }
+    .mode-toggle {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 3px;
+    }
+    .mode-btn {
+      padding: 6px 18px; border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; color: var(--muted); background: transparent;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .mode-btn.active {
+      background: var(--white); color: var(--navy); font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+    }
+
+    .btn-run {
+      padding: 9px 24px; background: #16a34a;
+      border: none; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 600;
+      color: #fff; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap; align-self: flex-end; letter-spacing: 0.2px;
+    }
+    .btn-run:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); }
+    .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Loading ── */
+    .loading {
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; padding: 56px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .loading.visible { display: flex; }
+    .spinner {
+      width: 34px; height: 34px;
+      border: 2.5px solid var(--border); border-top-color: var(--navy);
+      border-radius: 50%; animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-label { font-size: 0.82rem; color: var(--muted); }
+    .loading-step  { font-size: 0.73rem; color: var(--subtle); animation: blink 1.8s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+    /* ── Error ── */
+    .error-box {
+      display: none;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: var(--radius); padding: 14px 18px;
+      color: #b91c1c; font-size: 0.82rem; margin-bottom: 20px;
+    }
+    .error-box.visible { display: block; }
+
+    /* ── Result area ── */
+    #result-area { display: none; }
+    #result-area.visible { display: block; }
+
+    .result-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+    }
+    .result-left { display: flex; align-items: center; gap: 8px; }
+    .result-title {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .tag { font-size: 0.68rem; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+    .tag-doc       { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .tag-purchaser { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .tag-cxo       { background: #faf5ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+
+    .btn-copy {
+      font-family: 'Inter', sans-serif; font-size: 0.73rem;
+      color: var(--muted); background: var(--white);
+      border: 1px solid var(--border); border-radius: 7px;
+      padding: 5px 12px; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-copy:hover { color: var(--navy); border-color: #94a3b8; }
+
+    /* ── Cards — vertical single column ── */
+    .cards-grid {
+      display: flex; flex-direction: column;
+      gap: 10px; max-width: 720px;
+    }
+
+    .insight-card { --accent: #2563eb; }
+    .insight-card:nth-child(5n+2) { --accent: #059669; }
+    .insight-card:nth-child(5n+3) { --accent: #d97706; }
+    .insight-card:nth-child(5n+4) { --accent: #dc2626; }
+    .insight-card:nth-child(5n+5) { --accent: #7c3aed; }
+
+    .insight-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      animation: fadeUp 0.25s ease both;
+      transition: box-shadow 0.15s;
+    }
+    .insight-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+
+    .insight-card:nth-child(1)  { animation-delay: 0.03s; }
+    .insight-card:nth-child(2)  { animation-delay: 0.06s; }
+    .insight-card:nth-child(3)  { animation-delay: 0.09s; }
+    .insight-card:nth-child(4)  { animation-delay: 0.12s; }
+    .insight-card:nth-child(5)  { animation-delay: 0.15s; }
+    .insight-card:nth-child(6)  { animation-delay: 0.18s; }
+    .insight-card:nth-child(7)  { animation-delay: 0.21s; }
+    .insight-card:nth-child(8)  { animation-delay: 0.24s; }
+    .insight-card:nth-child(9)  { animation-delay: 0.27s; }
+    .insight-card:nth-child(10) { animation-delay: 0.30s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+    .card-num  { font-size: 0.62rem; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+    .card-heading {
+      font-size: 0.72rem; font-weight: 700; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .card-body { font-size: 0.83rem; line-height: 1.65; color: #374151; }
+    .card-body strong { color: #111827; font-weight: 600; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 14px 24px;
+      text-align: center; font-size: 0.68rem; color: var(--subtle);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">CS Analyzer</span>
+  <span class="logo-sep">/</span>
+  <span class="logo-sub">Procurement Intelligence</span>
+  <span class="header-badge">Gemini 2.5 Flash</span>
+</header>
+
+<main>
+
+  <!-- Control bar -->
+  <div class="control-bar">
+    <div class="field-wrap">
+      <label for="doc-no-input">Document Number</label>
+      <input id="doc-no-input" type="text" placeholder="e.g. 000186" value="000186" autocomplete="off" />
+    </div>
+
+    <div class="mode-wrap">
+      <label>View Mode</label>
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="purchaser" id="btn-purchaser" onclick="setMode('purchaser')">Purchaser</button>
+        <button class="mode-btn"        data-mode="cxo"       id="btn-cxo"       onclick="setMode('cxo')">CXO</button>
+      </div>
+    </div>
+
+    <button class="btn-run" id="analyze-btn" onclick="runAnalysis()">Analyze →</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p class="loading-label">Fetching comparative statement data...</p>
+    <span class="loading-step" id="loading-step">Running stored procedure</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Results -->
+  <div id="result-area">
+    <div class="result-bar">
+      <div class="result-left">
+        <span class="result-title">Results</span>
+        <span class="tag tag-doc" id="result-doc-label"></span>
+        <span class="tag"         id="result-mode-chip"></span>
+      </div>
+      <button class="btn-copy" id="copy-btn" onclick="copyResult()">Copy JSON</button>
+    </div>
+    <div class="cards-grid" id="cards-output"></div>
+  </div>
+
+</main>
+
+<footer>CS Analyzer &nbsp;·&nbsp; Gemini 2.5 Flash &nbsp;·&nbsp; eProcurement Vendor Portal</footer>
+
+<script>
+  // API_BASE is empty so all requests go to the same origin (served by FastAPI)
+  const API_BASE   = "";
+  let lastInsights = [];
+  let currentMode  = "purchaser";
+
+  const steps = [
+    "Running stored procedure...",
+    "Fetching CS markdown...",
+    "Building prompt...",
+    "Sending to Gemini 2.5 Flash...",
+    "Generating structured insights...",
+  ];
+  let stepTimer = null;
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll(".mode-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.mode === mode);
+    });
+  }
+
+  function startSteps() {
+    let i = 0;
+    document.getElementById("loading-step").textContent = steps[0];
+    stepTimer = setInterval(() => {
+      i = (i + 1) % steps.length;
+      document.getElementById("loading-step").textContent = steps[i];
+    }, 2500);
+  }
+  function stopSteps() { clearInterval(stepTimer); }
+
+  function renderBody(str) {
+    return String(str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  function renderCards(insights) {
+    const grid = document.getElementById("cards-output");
+    grid.innerHTML = "";
+    insights.forEach(card => {
+      const el = document.createElement("div");
+      el.className = "insight-card";
+      el.innerHTML = `
+        <div class="card-meta">
+          <span class="card-num">${String(card.num).padStart(2, "0")}</span>
+          <span class="card-heading">${renderBody(card.heading)}</span>
+        </div>
+        <div class="card-body">${renderBody(card.body)}</div>
+      `;
+      grid.appendChild(el);
+    });
+  }
+
+  async function runAnalysis() {
+    const docNo = document.getElementById("doc-no-input").value.trim();
+    if (!docNo) { alert("Enter a CS Document Number."); return; }
+
+    document.getElementById("error-box").className   = "error-box";
+    document.getElementById("result-area").className = "";
+    document.getElementById("loading").className     = "loading visible";
+    document.getElementById("analyze-btn").disabled  = true;
+    startSteps();
+
+    try {
+      const res  = await fetch(`${API_BASE}/analyze`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ doc_no: docNo, mode: currentMode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Server error");
+
+      lastInsights = data.insights;
+      document.getElementById("result-doc-label").textContent = `CS ${data.doc_no}`;
+
+      const chip = document.getElementById("result-mode-chip");
+      chip.textContent = currentMode === "cxo" ? "CXO View" : "Purchaser View";
+      chip.className   = `tag tag-${currentMode === "cxo" ? "cxo" : "purchaser"}`;
+
+      renderCards(lastInsights);
+      document.getElementById("result-area").className = "visible";
+
+    } catch (err) {
+      const box = document.getElementById("error-box");
+      box.textContent = `Error: ${err.message}`;
+      box.className   = "error-box visible";
+    } finally {
+      stopSteps();
+      document.getElementById("loading").className    = "loading";
+      document.getElementById("analyze-btn").disabled = false;
+    }
+  }
+
+  function copyResult() {
+    if (!lastInsights.length) return;
+    navigator.clipboard.writeText(JSON.stringify(lastInsights, null, 2)).then(() => {
+      const btn = document.getElementById("copy-btn");
+      btn.textContent = "Copied ✓";
+      setTimeout(() => { btn.textContent = "Copy JSON"; }, 2000);
+    });
+  }
+
+  document.getElementById("doc-no-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") runAnalysis();
+  });
+</script>
+</body>
+</html>

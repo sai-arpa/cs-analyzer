@@ -1,0 +1,19 @@
+# CS Analyzer — Python Dependencies
+# Install: pip install -r cs_analyzer/requirements.txt
+
+# Web framework & server
+fastapi>=0.111.0
+uvicorn>=0.29.0
+
+# Database
+sqlalchemy>=2.0.0
+pyodbc>=5.0.0
+
+# AI
+google-genai>=1.0.0
+
+# Token counting (used in analyzer.py for usage reporting)
+tiktoken>=0.7.0
+
+# Environment & utilities
+python-dotenv>=1.0.0
