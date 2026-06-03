@@ -1,0 +1,23 @@
+[Unit]
+Description=CS Analyzer FastAPI Application
+After=network.target
+
+[Service]
+# User running the process. Adjust if using Amazon Linux (ec2-user) or a different user.
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/cs-analyzer
+
+# Provide path to the virtual environment
+Environment="PATH=/var/www/cs-analyzer/venv/bin"
+EnvironmentFile=/var/www/cs-analyzer/.env
+
+# Command to start the application
+ExecStart=/var/www/cs-analyzer/venv/bin/uvicorn cs_analyzer.api:app --host 0.0.0.0 --port 8001
+
+# Restart policy
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
