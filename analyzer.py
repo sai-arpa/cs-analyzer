@@ -1,6 +1,6 @@
 # analyzer.py
 # Core analysis module: fetch CS markdown from DB, send to Gemini, return structured insights.
-# Run directly: python cs_analyzer/analyzer.py [doc_no] [purchaser|cxo]
+# Run directly: python analyzer.py [doc_no] [purchaser|cxo]
 
 import os
 import sys

@@ -13,7 +13,7 @@ Environment="PATH=/var/www/cs-analyzer/venv/bin"
 EnvironmentFile=/var/www/cs-analyzer/.env
 
 # Command to start the application
-ExecStart=/var/www/cs-analyzer/venv/bin/uvicorn cs_analyzer.api:app --host 0.0.0.0 --port 8001
+ExecStart=/var/www/cs-analyzer/venv/bin/uvicorn api:app --host 0.0.0.0 --port 8001
 
 # Restart policy
 Restart=always

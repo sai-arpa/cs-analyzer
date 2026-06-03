@@ -1,5 +1,5 @@
 # CS Analyzer — Python Dependencies
-# Install: pip install -r cs_analyzer/requirements.txt
+# Install: pip install -r requirements.txt
 
 # Web framework & server
 fastapi>=0.111.0

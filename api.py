@@ -1,7 +1,7 @@
 # api.py
 # FastAPI backend for CS Analyzer.
-# Run: python cs_analyzer/api.py
-# Or:  uvicorn cs_analyzer.api:app --host 0.0.0.0 --port 8001 --reload
+# Run: python api.py
+# Or:  uvicorn api:app --host 0.0.0.0 --port 8001 --reload
 
 import os
 import sys
@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from cs_analyzer.analyzer import run_analysis
+from analyzer import run_analysis
 
 app = FastAPI(title="CS Analyzer API", version="1.0.0")
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     print(f"Mode: {'development (reload on)' if dev else 'production'}\n")
 
     uvicorn.run(
-        "cs_analyzer.api:app",
+        "api:app",
         host="0.0.0.0",
         port=port,
         reload=dev,          # True only when DEV_MODE=1 in .env
